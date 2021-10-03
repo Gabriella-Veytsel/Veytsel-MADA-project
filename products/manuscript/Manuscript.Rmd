@@ -19,8 +19,7 @@ The structure below is a possible setup for a data analysis project (including t
 
 
 # Summary/Abstract
-_Write a summary of your project._
-
+I plan to investigate the transmission dynamics of SARS-CoV-2 within Houston and between Houston and surrounding areas (the rest of Texas and the United States). 
 
 # Introduction 
 
@@ -28,24 +27,23 @@ _Write a summary of your project._
 _Provide enough background on your topic that others can understand the why and how of your analysis_ 
 
 ## Description of data and data source
-_Describe what the data is, what it contains, where it is from, etc. Eventually this might be part of a methods section._
+As of 10/3/2021, there are 88,776 sequences from Texas uploaded to GISAID (beginning in Feb 2020). After downloading these data, I will align sequences to a reference genome via MAFFT and trim them in Geneious. I will subsample these down to ~400 samples, so that the size is workable in BEAST. Since my focus is on Houston, I will randomly subsample these data while keeping 30% of sequences to Houston. 
+
+I will also use case incidence data from the Texas Health Department, as of 10/3/2021.
 
 ## Questions/Hypotheses to be addressed
-_State the research questions you plan to answer with this analysis._
+Using case incidence data, assess spatial heterogeneity (county-level) of SARS-CoV-2 in Texas. 
 
-
+Using genomic data, phylogeographic analysis (county-level).
 
 # Methods and Results
-
-_In most research papers, results and methods are separate. You can combine them here if you find it easier. You are also welcome to structure things such that those are separate sections._
-
+Discrete trait analysis (county) in BEAST to estimate transition rates between counties, identify statistically supported transitions (BF values), and calculate R0. 
 
 ## Data aquisition
 _As applicable, explain where and how you got the data. If you directly import the data from an online source, you can combine this section with the next._
 
 ## Data import and cleaning
 _Write code that reads in the file and cleans it so it's ready for analysis. Since this will be fairly long code for most datasets, it might be a good idea to have it in one or several R scripts. If that is the case, explain here briefly what kind of cleaning/processing you do, and provide more details and well documented code somewhere (e.g. as supplement in a paper). All materials, including files that contain code, should be commented well so everyone can follow along._
-
 
 ## Exploratory analysis
 
