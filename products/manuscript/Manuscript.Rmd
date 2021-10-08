@@ -19,25 +19,28 @@ The structure below is a possible setup for a data analysis project (including t
 
 
 # Summary/Abstract
-I plan to investigate the transmission dynamics of SARS-CoV-2 within Houston and between Houston and surrounding areas (the rest of Texas and the United States). 
 
 # Introduction 
 
 ## General Background Information
-_Provide enough background on your topic that others can understand the why and how of your analysis_ 
 
 ## Description of data and data source
-As of 10/3/2021, there are 88,776 sequences from Texas uploaded to GISAID (beginning in Feb 2020). After downloading these data, I will align sequences to a reference genome via MAFFT and trim them in Geneious. I will subsample these down to ~400 samples, so that the size is workable in BEAST. Since my focus is on Houston, I will randomly subsample these data while keeping 30% of sequences to Houston. 
+Data from the Texas Health Department, as of 10/3/2021.
+-New confirmed cases and fatalities by date (n = 579)
+-Confirmed cases and fatalities aggregated by county (n = 254)
 
-I will also use case incidence data from the Texas Health Department, as of 10/3/2021.
+Download lineage/clade metadata from GISAID for each county
 
 ## Questions/Hypotheses to be addressed
-Using case incidence data, assess spatial heterogeneity (county-level) of SARS-CoV-2 in Texas. 
+Look at spatial heterogeneity within Texas counties (case incidence and mortality)
 
-Using genomic data, phylogeographic analysis (county-level).
+Estimate the reproductive number for each county
+
+Assess the association between population size, population density, and dominant lineage/clade with case incidence, mortality, and reproductive number (regression model)
+
+Use DSAIDE package, regression methods
 
 # Methods and Results
-Discrete trait analysis (county) in BEAST to estimate transition rates between counties, identify statistically supported transitions (BF values), and calculate R0. 
 
 ## Data aquisition
 _As applicable, explain where and how you got the data. If you directly import the data from an online source, you can combine this section with the next._
@@ -62,10 +65,10 @@ knitr::kable(resulttable, caption = 'Data summary table.')
 ```
 
 
-Figure \@ref(fig:resultfigure) shows a scatterplot figure produced by one of the R scripts.
+Figure \@ref(fig:epicurve) shows an epi curve produced by one of the R scripts.
 
-```{r resultfigure,  fig.cap='Analysis figure.', echo=FALSE}
-knitr::include_graphics("../../results/resultfigure.png")
+```{r epicurve,  fig.cap='Epi Curve.', echo=FALSE}
+knitr::include_graphics("../../results/epicurve.png")
 ```
 
 
