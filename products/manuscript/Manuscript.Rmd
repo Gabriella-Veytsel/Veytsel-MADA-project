@@ -1,88 +1,105 @@
 ---
-title: "Example Manuscript Template for a Data Analysis Project"
-subtitle: ""
-author: Andreas Handel
-date: "`r Sys.Date()`"
-site: bookdown::bookdown_site
-documentclass: article
+title: 'MADA Data Analysis Project: COVID'
+author: "Andreas Handel"
+date: '`r Sys.Date()`'
 output:
-  bookdown::word_document2: 
-    toc: false
-    number_sections: true
-  bookdown::html_document2: 
-    toc: false
-bibliography: ../references.bib
+  bookdown::word_document2:
+    number_sections: yes
+    toc: no
+  bookdown::html_document2:
+    toc: no
+documentclass: article
 csl: ../apa.csl
+site: bookdown::bookdown_site
+subtitle: ''
+bibliography: ../references.bib
 ---
 
-The structure below is a possible setup for a data analysis project (including the course project). For a manuscript, adjust as needed.
-
-
 # Summary/Abstract
+Understanding the patterns in COVID-19 burden at the county-level can inform targeted public health interventions and resource allocation.
 
 # Introduction 
+Given limited resources, decisions for COVID-19 testing, monitoring, and interventions must be data-driven. We aim to characterize the inter-county variability in COVID-19 burden and identify important predictors to help guide public health response and resource allocation, such as vaccine distribution, deployment of mobile testing units, health messaging/education, wastewater monitoring, and hospital equipment. Utilizing county-level risk factors in decision-making, in addition to case counts, hospitalizations, and deaths, may allow for a more robust public health response. 
 
 ## General Background Information
+Underreporting in cases, due to county-level variation in testing availability and individual-level differences in healthcare access and health-seeking behavior, is a standard consideration in disease reporting. With the significant proportion of asymptomatic cases and issues in testing capacity during the early phase, it is a particularly important challenge in the current COVID-19 epidemic.
 
 ## Description of data and data source
-Data from the Texas Health Department, as of 10/3/2021.
--New confirmed cases and fatalities by date (n = 579)
--Confirmed cases and fatalities aggregated by county (n = 254)
-
-Download lineage/clade metadata from GISAID for each county
+* Data from the Texas Health Department: https://dshs.texas.gov/coronavirus/AdditionalData.aspx
+    + Cases.and.Fatalities: case count data at the county-level, total 
+    + Trends: new cases at the state-level, by date 
+    + NewCasesTime: new cases at the county-level, by date
+    + Demographics: sex, race/ethnicity population
+    + Vaccination: 1-dose and fully vaccinated population
+  
+* Shapefile of Texas with county boundaries: https://www.depts.ttu.edu/geospatial/center/TexasGISData.html
+    + Includes data on county population and area to calculate county population density
 
 ## Questions/Hypotheses to be addressed
-Look at spatial heterogeneity within Texas counties (case incidence and mortality)
-
-Estimate the reproductive number for each county
-
-Assess the association between population size, population density, and dominant lineage/clade with case incidence, mortality, and reproductive number (regression model)
-
-Use DSAIDE package, regression methods
+* Investigate the spatial heterogeneity of COVID-19 incidence within Texas over time at the county-level.
+* Evalauate the associations between county-level characteristics (e.g., population density, population demographics, and vaccination coverage) and COVID-19 burden.
 
 # Methods and Results
-
-## Data aquisition
-_As applicable, explain where and how you got the data. If you directly import the data from an online source, you can combine this section with the next._
+* Estimate county-level cumulative rates of COVID-19: new cases per 100,000 county residents
+* Test for spatial autocorrelation using Moran's I
+* Multivariable regression, with spatial effects, using negative binomial regression to account for overdispersion (excess zeroes)
 
 ## Data import and cleaning
-_Write code that reads in the file and cleans it so it's ready for analysis. Since this will be fairly long code for most datasets, it might be a good idea to have it in one or several R scripts. If that is the case, explain here briefly what kind of cleaning/processing you do, and provide more details and well documented code somewhere (e.g. as supplement in a paper). All materials, including files that contain code, should be commented well so everyone can follow along._
 
 ## Exploratory analysis
 
-_Use a combination of text/tables/figures to explore and describe your data. You should produce plots or tables or other summary quantities for the most interesting/important quantities in your data. Depending on the total number of variables in your dataset, explore all or some of the others. FIgures produced here might be histograms or density plots, correlation plots, etc. Tables might summarize your data._
+Cases over time for Texas.
 
-_Continue by creating plots or tables of the outcome(s) of interest and the predictor/exposure/input variables you are most interested in. If your dataset is small, you can do that for all variables. Plots produced here can be scatterplots, boxplots, violinplots, etc. Tables can be simple 2x2 tables or larger ones._
-
-_To get some further insight into your data, if reasonable you could compute simple statistics (e.g. t-tests, simple regression model with 1 predictor, etc.) to look for associations between your outcome(s) and each individual predictor variable. Though note that unless you pre-specified the outcome and main exposure, any "p<0.05 means statistical significance" interpretation is not valid._
-
-Table \@ref(tab:summarytable) shows a table summarizing the data.
-
-
-```{r summarytable,  echo=FALSE}
-resulttable=readRDS("../../results/summarytable.rds")
-knitr::kable(resulttable, caption = 'Data summary table.')
-```
-
-
-Figure \@ref(fig:epicurve) shows an epi curve produced by one of the R scripts.
-
-```{r epicurve,  fig.cap='Epi Curve.', echo=FALSE}
+```{r epicurve,  fig.cap='', echo=FALSE}
 knitr::include_graphics("../../results/epicurve.png")
 ```
 
+County-level characteristics across Texas
 
-## Full analysis
+```{r summarytable,  results = 'asis', echo=FALSE, message = FALSE, warning = FALSE}
+library(tidyverse)
 
-_Use one or several suitable statistical/machine learning methods to analyze your data and to produce meaningful figures, tables, etc. This might again be code that is best placed in one or several separate R scripts that need to be well documented. You want the code to produce figures and data ready for display as tables, and save those. Then you load them here._
-
-Example table \@ref(tab:resulttable) shows a table summarizing a linear model fit.
-
-```{r resulttable,  echo=FALSE}
-resulttable=readRDS("../../results/resulttable.rds")
-knitr::kable(resulttable, caption = 'Linear model fit table.')
+resulttable=readRDS("../../results/summarytable.rds")
+knitr::kable(resulttable, caption = '') %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Times New Roman")
 ```
 
+County-level characteristics for Texas counties with the highest COVID-19 case burden
+
+```{r table_county,  results = 'asis', echo=FALSE, echo=FALSE, message = FALSE, warning = FALSE}
+library(tidyverse)
+
+resulttable=readRDS("../../results/table_county.rds")
+knitr::kable(resulttable, caption = '') %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Times New Roman")
+```
+
+Map of Texas, highlighting counties with the highest COVID-19 case burden
+
+```{r map_rates,  fig.cap='', echo=FALSE}
+knitr::include_graphics("../../results/map_rates.png")
+```
+
+Cases over time for Texas counties with the highest COVID-19 case burden
+
+```{r epicurve_county,  fig.cap='', echo=FALSE}
+knitr::include_graphics("../../results/epicurve_county.png")
+```
+
+Association between county-level characteristics and total confirmed COVID-19 cases.
+
+```{r associations,  fig.cap='', echo=FALSE}
+knitr::include_graphics("../../results/p_combined.png")
+```
+
+## Full analysis
+Output of a mixed effects model
+
+```{r glm_mixed,  fig.cap='GLM Random Effects Model.', echo=FALSE, message = FALSE, warning = FALSE}
+library(sjPlot)
+model=readRDS("../../results/model.rds")
+tab_model(model) 
+```
 
 # Discussion
 
@@ -90,7 +107,7 @@ knitr::kable(resulttable, caption = 'Linear model fit table.')
 _Summarize what you did, what you found and what it means._
 
 ## Strengths and Limitations
-_Discuss what you perceive as strengths and limitations of your analysis._
+There are many potentially important predictors that were not considered in this study, such as county-level proportions for urban/rural, medical conditions, household size,  socio-economic status, and frontline workers. While this study model used cumulative case counts, future studies investigating county-level case counts over time should also examine variant proportions and testing rates as predictors.
 
 ## Conclusions
 _What are the main take-home messages?_
