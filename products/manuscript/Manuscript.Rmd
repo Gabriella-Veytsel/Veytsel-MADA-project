@@ -3,10 +3,10 @@ title: 'MADA Data Analysis Project: COVID'
 author: "Andreas Handel"
 date: '`r Sys.Date()`'
 output:
+  bookdown::html_document2:
+    toc: no
   bookdown::word_document2:
     number_sections: yes
-    toc: no
-  bookdown::html_document2:
     toc: no
 documentclass: article
 csl: ../apa.csl
@@ -29,9 +29,9 @@ Underreporting in cases, due to county-level variation in testing availability a
     + Cases.and.Fatalities: case count data at the county-level, total 
     + Trends: new cases at the state-level, by date 
     + NewCasesTime: new cases at the county-level, by date
-    + Demographics: sex, race/ethnicity population
-    + Vaccination: 1-dose and fully vaccinated population
-  
+    + Demographics: sex, race/ethnicity
+    + Vaccination: 1-dose and fully vaccinated population, population 65+ from 2019 Census population estimates, population 16-64 any medical condition*
+    
 * Shapefile of Texas with county boundaries: https://www.depts.ttu.edu/geospatial/center/TexasGISData.html
     + Includes data on county population and area to calculate county population density
 
@@ -40,9 +40,13 @@ Underreporting in cases, due to county-level variation in testing availability a
 * Evalauate the associations between county-level characteristics (e.g., population density, population demographics, and vaccination coverage) and COVID-19 burden.
 
 # Methods and Results
-* Estimate county-level cumulative rates of COVID-19: new cases per 100,000 county residents
-* Test for spatial autocorrelation using Moran's I
-* Multivariable regression, with spatial effects, using negative binomial regression to account for overdispersion (excess zeroes)
+Cumulative numbers of COVID-19 cases and 2019 population estimates for each county were obtained from the Texas Department of Health. As counties containing major cities (e.g., Houston, Dallas, Fort Worth) had the highest total cases, cumulative case rates per 100 persons were calculated and mapped to visualize spatial heterogeneity across Texas counties. Epidemic curves were constructed to visualize new cases over time at the state- and county- levels (subset to 10 counties with the highest total case burden). County-level risk factors included in our analysis were: age (65 and older), gender (male), race/ethnicity (Black, Asian, and Hispanic), and any medical condition that increases risk of COVID*. 
+
+To estimate the association between county-level risk factors and cumulative case incidence, the following models were developed: Poisson regression, negative binomial regression, multivariable linear regression, and a generalized mixed effects model. For the Poisson model, the assumption that the mean and variance of number of cumulative COVID-19 cases were approximately equal was violated; additionally, there was evidence of severe overdispersion. Ultimately, this model was rejected as an appropriate model choice. The negative binomial regression model was included to relax the assumption of mean-variance equivalence and, accordingly, had superior performance. Several diagnostic plots (fitted vs. residual plots, normal QQ plot, scale-location, and residuals vs. leverage) were inspected to test if linear regression model assumptions were met. Indeed, the assumptions of linearity of the predictor and outcome, constant variance of residuals, normality of residuals, and independence of residuals error terms of the multivariable linear regression were accepted. 
+
+We used the TidyModels framework in R to build a penalized linear regression model (LASSO) and Random Forest regression model. LASSO removed the proportion male variable and applied a penality of 0.1 to remaining predictors. While the Random Forest model does not remove predictors, the VIP package in R also selected PercentMale as the least important variable. The best model for each approach was chosen based on RMSE and diagnostic plots, which was very similar (LASSO RMSE = 3.82, RF RMSE = 3.76). We selected the LASSO model as the final model and conducted 5-fold cross-validation on the test dataset one single time.
+
+*People 16 years of age and older with at least one chronic medical condition that puts them at increased risk for severe illness from the virus that causes COVID-19. The data are model-based estimates from CDC using self-reported data from the Behavioral Risk Factor Surveillance System and U.S. census population data. The methodology for generating these estimates are detailed in this MMWR: https://www.cdc.gov/mmwr/volumes/69/wr/mm6929a1.htm.
 
 ## Data import and cleaning
 
@@ -64,6 +68,12 @@ knitr::kable(resulttable, caption = '') %>%
   kableExtra::kable_classic(full_width = F, html_font = "Times New Roman")
 ```
 
+Map of Texas, highlighting counties with the highest COVID-19 case burden
+
+```{r map_rates,  fig.cap='', echo=FALSE}
+knitr::include_graphics("../../results/map_rates.png")
+```
+
 County-level characteristics for Texas counties with the highest COVID-19 case burden
 
 ```{r table_county,  results = 'asis', echo=FALSE, echo=FALSE, message = FALSE, warning = FALSE}
@@ -74,12 +84,6 @@ knitr::kable(resulttable, caption = '') %>%
   kableExtra::kable_classic(full_width = F, html_font = "Times New Roman")
 ```
 
-Map of Texas, highlighting counties with the highest COVID-19 case burden
-
-```{r map_rates,  fig.cap='', echo=FALSE}
-knitr::include_graphics("../../results/map_rates.png")
-```
-
 Cases over time for Texas counties with the highest COVID-19 case burden
 
 ```{r epicurve_county,  fig.cap='', echo=FALSE}
@@ -87,18 +91,55 @@ knitr::include_graphics("../../results/epicurve_county.png")
 ```
 
 Association between county-level characteristics and total confirmed COVID-19 cases.
+Spearman's correlation coefficient and regression line
 
 ```{r associations,  fig.cap='', echo=FALSE}
 knitr::include_graphics("../../results/p_combined.png")
 ```
 
 ## Full analysis
-Output of a mixed effects model
+Negative Binomial Model Evaluation
 
-```{r glm_mixed,  fig.cap='GLM Random Effects Model.', echo=FALSE, message = FALSE, warning = FALSE}
-library(sjPlot)
-model=readRDS("../../results/model.rds")
-tab_model(model) 
+```{r NegBinomial_diagnosticplots,  fig.cap='', echo=FALSE}
+knitr::include_graphics("../../results/NegBinomial_diagnosticplots.jpeg")
+```
+
+```{r NegBinomial_pred_vs_obs,  fig.cap='', echo=FALSE}
+knitr::include_graphics("../../results/NegBinomial_pred_vs_obs.jpeg")
+```
+
+```{r NegBinomialresiduals,  fig.cap='', echo=FALSE}
+knitr::include_graphics("../../results/NegBinomial_residuals.jpeg")
+```
+
+Generalized Linear Mixed Model Evaluation
+
+```{r mixed_pred_vs_obs,  fig.cap='', echo=FALSE}
+knitr::include_graphics("../../results/MixedModel_pred_vs_obs.jpeg")
+```
+
+```{r mixedresiduals,  fig.cap='', echo=FALSE}
+knitr::include_graphics("../../results/MixedModel_residuals.jpeg")
+```
+
+LASSO Model Evaluation
+
+```{r LASSO_pred_vs_obs,  fig.cap='', echo=FALSE}
+knitr::include_graphics("../../results/LASSO_predicted_vs_observed.jpeg")
+```
+
+```{r LASSOresiduals,  fig.cap='', echo=FALSE}
+knitr::include_graphics("../../results/LASSO_residuals.jpeg")
+```
+
+Random Forest Model Evaluation
+
+```{r rf_pred_vs_obs,  fig.cap='', echo=FALSE}
+knitr::include_graphics("../../results/RF_pred_vs_obs.jpeg")
+```
+
+```{r rfresiduals,  fig.cap='', echo=FALSE}
+knitr::include_graphics("../../results/RF_residuals.jpeg")
 ```
 
 # Discussion
@@ -107,7 +148,7 @@ tab_model(model)
 _Summarize what you did, what you found and what it means._
 
 ## Strengths and Limitations
-There are many potentially important predictors that were not considered in this study, such as county-level proportions for urban/rural, medical conditions, household size,  socio-economic status, and frontline workers. While this study model used cumulative case counts, future studies investigating county-level case counts over time should also examine variant proportions and testing rates as predictors.
+There are many potentially important predictors that were not considered in this study, such as county-level proportions for urban/rural, household size, and socio-economic status. 
 
 ## Conclusions
 _What are the main take-home messages?_

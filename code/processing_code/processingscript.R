@@ -120,7 +120,7 @@ merge_shp <- merge_shp %>%
 
 #Add cumulative case rates
 merge_shp <- merge_shp %>%
-  mutate(CumCaseRatePer1000 = `Confirmed Cases`/Total * 1000)
+  mutate(CumCaseRatePer100 = `Confirmed Cases`/Total * 100)
 
 #Add vaccination
 #Calculate proportions
@@ -132,9 +132,14 @@ merge_shp_vac <- merge_shp %>%
   mutate(PopulationVaccinated_full = as.numeric(`People Fully Vaccinated`)) %>%
   mutate(PercentVaccinated_full = PopulationVaccinated_full /  Total * 100) %>%
   
+  rename(PopulationMedCondition = `Population, 16-64\r\n Any Medical Condition`) %>%
+  mutate(PopulationMedCondition = as.numeric(PopulationMedCondition)) %>%
+  mutate(PercentMedCondition = PopulationMedCondition /  Total * 100) %>%
+    
   mutate(PercentHispanic = Hispanic_Total /  Total * 100) %>%
   mutate(PercentAsian = NH_Asian_Total /  Total * 100) %>%
-  mutate(PercentBlack = NH_Black_Total /  Total * 100)
+  mutate(PercentBlack = NH_Black_Total /  Total * 100) %>%
+  mutate(PercentMale = Total_Male / Total * 100)
 
 # save data as RDS
 # location to save file

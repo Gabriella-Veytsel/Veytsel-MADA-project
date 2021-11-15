@@ -1,9 +1,3 @@
-The following files have been updated:
-Code folder contains analysis code, data exploration code, and processing code
-Data folder contains raw and processed data
-Product folder contains manuscript code and manuscript html
-Results contains tables and figures produced from R scripts
-
-To reproduce everything, start with processingscript.R > explorationscript.R > analysisscript.R
-
-I have included outstanding questions in the analysisscript.R
+-Everything should be able to be reproduced, start with processingscript.R > explorationscript.rmd > analysisscript.R
+-Knit Manuscript.rmd (in products folder) to HTML
+-I will add more to the written sections + references next week! May need to ask some questions during office hours
