@@ -11,6 +11,7 @@
 
 #Load packages
 library(tidyverse)
+library(dplyr)
 library(tidymodels)
 library(poissonreg)
 library(lme4)
@@ -21,6 +22,7 @@ library(performance) #overdispersion
 library(AER) #overdispersion
 library(MASS) #negative binomial
 library(vip)
+library(skimr)
 
 #Load data
 save_data_location1 <- here::here("data","processed_data","merge_shp_vac_df_c.rds")
@@ -37,25 +39,41 @@ cleandata_Vaccination <- readRDS(save_data_location4)
 NewCasesTime_long <- readRDS(save_data_location5)
 cleandata_Demographics <- readRDS(save_data_location6)
 
-combined <- combined %>%
+head(combined)
+sum(combined$Population) #29,001,602 people
+sum(combined$`Confirmed Cases`) #3,394,815
+sum(combined$`Confirmed Cases`)/sum(combined$Population) * 100 #11.7 cases per 100 persons
+summary(combined$CumCaseRatePer100) #cumulative case rate per county ranged from 2.6 to 31.3 cases per 100 persons
+
+skim(combined)
+
+combined1 <- combined %>%
   dplyr::select(-COUNTY)
 
-#Is cumulative case rate normally distributed? No
-hist(combined$CumCaseRatePer100, main = "Histogram of Cumulative Case Rate per 1,000", xlab = "Cumulative Case Rate per 1,000")
-ggdensity(combined$CumCaseRatePer100, main = "Density Plot of Cumulative Case Rate per 1,000", xlab = "Cumulative Case Rate per 1,000")
-ggqqplot(combined$CumCaseRatePer100) #QQ plot
+#Population size and Population density correlated? Yes
+cor(combined$Population, combined$Population_Density, method = c("pearson", "kendall", "spearman"))
+cor.test(combined$Population, combined$Population_Density, method=c("pearson", "kendall", "spearman"))
 
-shapiro.test(combined$CumCaseRatePer100) #p-value = 5.8E-7 
+#Population and area? No
+cor(combined$Population, combined$AREA_SQKM, method = c("pearson", "kendall", "spearman"))
+cor.test(combined$Population, combined$AREA_SQKM, method=c("pearson", "kendall", "spearman"))
+
+#Is cumulative case rate normally distributed? No. 
+hist(combined1$CumCaseRatePer100, main = "Histogram of Cumulative Case Rate per 1,000", xlab = "Cumulative Case Rate per 1,000")
+ggdensity(combined1$CumCaseRatePer100, main = "Density Plot of Cumulative Case Rate per 1,000", xlab = "Cumulative Case Rate per 1,000")
+ggqqplot(combined1$CumCaseRatePer100) #QQ plot
+
+shapiro.test(combined1$CumCaseRatePer100) #p-value = 5.8E-7 
 #Data are significantly different from the normal distribution
 
 #*************
 #Poisson Model
 #*************
-mean(combined$`Confirmed Cases`) #mean
-var(combined$`Confirmed Cases`) #variance very very different
+mean(combined1$`Confirmed Cases`) #mean
+var(combined1$`Confirmed Cases`) #variance very very different
 out <- glm(`Confirmed Cases` ~ Percent65Plus +
              PercentAsian + PercentBlack + PercentHispanic + PercentMale +
-             PercentMedCondition + AREA_SQKM + offset(log(Population)), data = combined,
+             PercentMedCondition + AREA_SQKM + offset(log(Population)), data = combined1,
            family = poisson)
 summary(out) #residual deviance is 182633 for 246 degrees of freedom
 #Rule of thumb: this ratio should be 1, but it is 742, so severe overdispersion
@@ -73,7 +91,7 @@ plot(out) #OOH NOT GOOD
 
 out_nb <- glm.nb(`Confirmed Cases` ~ Percent65Plus + PercentMedCondition +
                    PercentAsian + PercentBlack + PercentHispanic + PercentMale +
-                   AREA_SQKM + offset(log(Population)), data = combined)
+                   AREA_SQKM + offset(log(Population)), data = combined1)
 summary(out_nb) 
 #Residual deviance is 260.67 for 247 degrees of freedom--ratio is about 1, so dispersion should be fine now
 
@@ -101,7 +119,6 @@ dev.off()
 #******************************************************
 #Generalized Linear Mixed Model (Random Effect: County)
 #******************************************************
-
 out_random <- glmer(formula = `Confirmed Cases` ~ offset(log(Population)) + #offset = population size
                       scale(Percent65Plus) + 
                       scale(PercentHispanic) +
@@ -116,7 +133,7 @@ out_random <- glmer(formula = `Confirmed Cases` ~ offset(log(Population)) + #off
 summary(out_random)
 fixef(out_random)
 model_results <- tab_model(out_random)
-rmse(out_random)
+rmse(out_random) #2.81
 
 jpeg(file = "results/MixedModel_pred_vs_obs.jpeg")
 #predicted versus observed
@@ -162,8 +179,8 @@ fit_recipe <- recipe(CumCaseRatePer100 ~ Percent65Plus +
 
 RMSE_null_train <- sqrt(sum( (training_data$CumCaseRatePer100 - mean(training_data$CumCaseRatePer100))^2 )/nrow(training_data))
 RMSE_null_test <- sqrt(sum( (testing_data$CumCaseRatePer100 - mean(testing_data$CumCaseRatePer100))^2 )/nrow(testing_data))
-print(RMSE_null_train)
-print(RMSE_null_test)
+print(RMSE_null_train) #4.297486
+print(RMSE_null_test) #3.807312
 
 #LASSO model
 #***********
@@ -203,10 +220,14 @@ top_models <- lasso_res %>%
 top_models
 
 #LASSO evaluation
+jpeg(file = "results/LASSO_regularization.jpeg")
 lasso_res %>% autoplot()
+title(main = "LASSO Regularization")
+dev.off()
+# this is a great way to see that regularization helps this modeling a lot
 
 #get the tuned model that performs best
-best_lasso <- lasso_res %>%  select_best(metric = "rmse")
+best_lasso <- lasso_res %>%  select_best(metric = "rmse") #best rmse = 3.82
 
 #finalize workflow with best model
 best_lasso_wf <- lasso_workflow %>% 
@@ -220,13 +241,37 @@ lasso_pred <- predict(best_lasso_fit, training_data)
 
 #Plotting LASSO variables as function of tuning parameter
 x <- best_lasso_fit$fit$fit$fit
+
+jpeg(file = "results/LASSO_tuning.jpeg")
 plot(x, "lambda")
+title(main = "LASSO Variables as a Function of Tuning Parameter")
+dev.off()
+
 # the larger the regularization penalty, the fewer predictor variables that remain in the model. (Once a coefficient is at 0, 
 # the corresponding variable is not in the model anymore).
 
 #This shows the variables that are part of the best-fit LASSO model, i.e. those that have a non-zero coefficient.
 tidy(extract_fit_parsnip(best_lasso_fit)) %>% filter(estimate != 0)
 #Percent male was removed
+
+tidy(best_lasso_fit, conf.int=TRUE, conf.level=0.95) #why does this not give confidence intervals?
+
+#pull out the fit object
+y <- best_lasso_fit$fit$fit$fit
+
+#plot variable importance. this is weird and unexpected.
+best_lasso_wf  %>%
+  fit(training_data) %>%
+  extract_fit_parsnip() %>%
+  vi(lambda = best_lasso_fit$penalty) %>%
+  mutate(
+    Importance = abs(Importance),
+    Variable = fct_reorder(Variable, Importance)
+  ) %>%
+  ggplot(aes(x = Importance, y = Variable, fill = Sign)) +
+  geom_col() +
+  scale_x_continuous(expand = c(0, 0)) +
+  labs(y = NULL)
 
 lasso_perfomance <- lasso_res %>% show_best(n = 1)
 print(lasso_perfomance) #rmse = 3.82
@@ -274,7 +319,7 @@ rf_tune_res <- rf_workflow %>%
   )
 
 rf_tune_res %>% 
-  show_best(metric = "rmse") #best rmse is 3.77
+  show_best(metric = "rmse") #best rmse is 3.77 
 
 #random forest evaluation
 autoplot(rf_tune_res) #plots the results of the tuning process
@@ -302,7 +347,10 @@ rf_pred <- predict(best_rf_fit, training_data)
 x <- best_rf_fit$fit$fit$fit
 
 #plot variable importance
+jpeg(file = "results/rf_vip.jpeg")
+title(main ="Variable Importance, Random Forest Model")
 vip(x, num_features = 20) #PercentHispanic > Percent65Plus > PercentMedCondition > PercentAsian > PercentBlack > PercentMale > Area
+dev.off()
 
 #Plotting observed/predicted and residuals.
 jpeg(file = "results/RF_pred_vs_obs.jpeg")
@@ -322,21 +370,26 @@ rf_perfomance <- rf_tune_res %>% show_best(n = 1)
 print(rf_perfomance)
 
 #Apply the model a single time to the test data
-#RANDOM FOREST!!
+#let's do random forest
 final_fit <- best_rf_wf %>% last_fit(data_split)
 test_performance <- final_fit %>% collect_metrics()
-print(test_performance)
+print(test_performance) #3.32 and rsq = 0.244
 
 test_predictions <- final_fit %>% collect_predictions()
 #Plotting observed/predicted and residuals.
 
+jpeg(file = "results/rf_testing_pred_vs_obs.jpeg")
 #predicted versus observed
 plot(test_predictions$.pred,testing_data$CumCaseRatePer100)
 abline(a=0,b=1, col = 'red') #45 degree line, along which the results should fall
+title(main ="Predicted vs. Observed, Final Model (Random Forest) on Test Data")
+dev.off()
+jpeg(file = "results/rf_testing_residuals.jpeg")
 #residuals
 plot(test_predictions$.pred-testing_data$CumCaseRatePer100)
 abline(a=0,b=0, col = 'red') #straight line, along which the results should fall
-
+title(main ="Residuals, Final Model (Random Forest) on Test Data")
+dev.off()
 
 
 

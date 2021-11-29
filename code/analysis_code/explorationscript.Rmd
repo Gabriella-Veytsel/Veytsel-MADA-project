@@ -4,7 +4,7 @@ author: "Gabriella Veytsel"
 date: "November 12, 2021"
 output: html_document
 ---
-#load packages
+Load packages
 ```{r}
 library(readxl) #for loading Excel files
 library(here) #to set paths
@@ -19,7 +19,7 @@ library(cowplot)
 library(table1) #html table 1
 ```
 
-#Read RDS files from processingscript.R
+Read RDS files from processingscript.R
 ```{r}
 save_data_location1 <- here::here("data","processed_data","merge_shp_vac.rds")
 save_data_location2 <- here::here("data","processed_data","cleandata_Trends.rds")
@@ -36,13 +36,14 @@ NewCasesTime_long <- readRDS(save_data_location5)
 cleandata_Demographics <- readRDS(save_data_location6)
 ```
 
-#Epidemic curve
+Epidemic curve
 ```{r}
 epicurve <- ggplot(cleandata_Trends, aes(x=Date, y = `New Confirmed Cases`)) +
   geom_bar(stat = "identity", fill="lightblue3") +
   scale_x_date(date_breaks = "months" , 
                date_labels = "%b-%y", 
-               limits = c(min(cleandata_Trends$Date), max = max(cleandata_Trends$Date)))
+               limits = c(min(cleandata_Trends$Date), max = max(cleandata_Trends$Date))) + 
+  theme(axis.text.x = element_text(angle = 45))
 
 epicurve
 
@@ -51,36 +52,7 @@ figure_file_epicurve = here("results","epicurve.png")
 ggsave(filename = figure_file_epicurve, plot=epicurve, height = 5, width = 8) 
 ```
 
-#Epidemic Curve, by County
-```{r}
-#Too many counties for facet_wrap, narrow down to top 10 counties
-NewCasesTime_long %>%
-  group_by(County) %>%
-  summarize(Sum = sum(NewCases)) %>%
-  arrange(desc(Sum))
-
-NewCasesTime_long_subset <- NewCasesTime_long %>%
-  filter(County %in% c("Harris", "Dallas", "Tarrant", "Bexar", "El Paso", "Travis", "Collin", "Fort Bend", "Hidalgo", "Denton"))
-
-epicurve_county <- ggplot(NewCasesTime_long_subset, aes(x=Date, y = NewCases)) +
-  geom_bar(stat = "identity", fill="lightblue3") +
-  scale_x_date(date_breaks = "months" , 
-               date_labels = "%b-%y", 
-               limits = c(min(NewCasesTime_long$Date), max = max(NewCasesTime_long$Date))) + 
-  facet_wrap(~County, nrow = 2) + #2 rows
-  theme(axis.text.x = element_text(angle=50, hjust=1)) +
-  labs(title = "Epidemic Curve", 
-       subtitle = "Subset to counties with the most total cases in Texas",
-       y = "New Cases", x = "")
-
-epicurve_county
-
-#Save figure
-figure_file_epicurve_county = here("results","epicurve_county.png")
-ggsave(filename = figure_file_epicurve_county, plot=epicurve_county, height = 5, width = 15) 
-```
-
-#Confirmed Case, by County
+Confirmed Case, by County
 ```{r}
 tail(sort(merge_shp_vac$`Confirmed Cases`),10) #top 10 counties with the most confirmed cases
 map_cases <- ggplot(merge_shp_vac) +
@@ -101,18 +73,64 @@ ggsave(filename = figure_file_map_cases, plot=map_cases, height = 12, width = 15
 #Cumulative Confirmed Case Rate/100 Persons, by County
 ```{r}
 tail(sort(merge_shp_vac$CumCaseRatePer100),10) #top 10 counties with the highest cumulative case rate
+
+sites <- data.frame(latitude = c(35.4044, 34.5258, 34.1065, 33.6754, 29.8688,
+                                  28.4117, 29.3343, 28.7410, 28.9089, 29.7525),
+                    longitude = c(-101.9805, -100.1703, -101.8892, -101.7980, -101.1617,
+                                  -99.8125, -99.8125, -100.3498, -97.8722, -94.6864))
+#Potter: 35.4044° N, 101.9805° W
+#Childress: 34.5258° N, 100.1703° W
+#Hale: 34.1065° N, 101.8892° W
+#Lubbock: 33.6754° N, 101.7980° W
+#Val Verde: 29.8688° N, 101.1617° W
+#Dimmit: 28.4117° N, 99.8125° W
+#Uvalde: 29.3343° N, 99.8125° W
+#Maverick: 28.7410° N, 100.3498° W
+#Karnes: 28.9089° N, 97.8722° W
+#Chambers: 29.7525° N, 94.6864° W
+
 map_rates <- ggplot(merge_shp_vac) +
-  geom_sf(aes(fill = CumCaseRatePer100)) +
+  geom_sf(aes(fill = CumCaseRatePer100), colour = "white", size = 0.05) +
+  geom_point(data = sites, aes(x = longitude, y = latitude), size = 2, shape = 23, fill = "black") +
+  geom_sf_text(data = subset(merge_shp_vac, CumCaseRatePer100 >= 19.1), aes(label = COUNTY), size = 4.5, nudge_y = -0.13) +
   ggtitle("Cumulative Confirmed Case Rate/100 Persons, by County, as of 10/3/2021") +
-  geom_sf_text(data = subset(merge_shp_vac, CumCaseRatePer100 >= 191), aes(label = COUNTY), size = 2.5) +
   scale_fill_gradient(low = "light blue", high = "red", name = "Cumulative Confirmed Case Rate/100 Persons", labels = comma)
 
 map_rates
-#Very different results, hmm...let's summarize county-level characteristics
 
 #Save figure
 figure_file_map_rates = here("results","map_rates.png")
 ggsave(filename = figure_file_map_rates, plot=map_rates, height = 12, width = 15) 
+```
+
+Epidemic Curve, by County
+```{r}
+#Too many counties for facet_wrap, narrow down to top 10 counties with highest case burden
+NewCasesTime_long %>%
+  group_by(County) %>%
+  summarize(Sum = sum(NewCases)) %>%
+  arrange(desc(Sum))
+
+NewCasesTime_long_subset <- NewCasesTime_long %>%
+  filter(County %in% c("Dimmit", "Hale", "Uvalde", "Maverick", "Karnes", "Childress", "Lubbock", "Val Verde", "Potter", "Chambers"))
+
+epicurve_county <- ggplot(NewCasesTime_long_subset, aes(x=Date, y = NewCases)) +
+  geom_bar(stat = "identity", fill="darkblue") +
+  scale_x_date(date_breaks = "months" , 
+               date_labels = "%b-%y", 
+               limits = c(min(NewCasesTime_long$Date), max = max(NewCasesTime_long$Date))) + 
+  scale_y_continuous(limits = c(min=0, max = 750)) +
+  facet_wrap(~County, nrow = 2) + #2 rows 
+  theme(axis.text.x = element_text(angle=50, hjust=1)) +
+  labs(title = "Epidemic Curve", 
+       subtitle = "Subset to counties with the highest case burden",
+       y = "Cumulative Case Rate", x = "")
+
+epicurve_county
+
+#Save figure
+figure_file_epicurve_county = here("results","epicurve_county.png")
+ggsave(filename = figure_file_epicurve_county, plot=epicurve_county, height = 5, width = 15) 
 ```
 
 ```{r}
@@ -153,119 +171,96 @@ table_county <- merge_shp_vac_df_c %>%
 #Save table
 save_data_location6 <- here::here("results","table_county.rds")
 saveRDS(table_county, file = save_data_location6)
+
+library(vtable)
+summarytable <- sumtable(merge_shp_vac_df_c, summ = c('mean(x)', 'min(x)', 'max(x)'),
+         title="", out = "return")
+
+#Save table
+save_data_location17 <- here::here("results","summarytable.rds")
+saveRDS(summarytable, file = save_data_location17)
 ```
 
-#Association between county-level characteristics and # confirmed cases 
+Association between county-level characteristics and # confirmed cases 
 ```{r}
-p1 <- ggscatter(merge_shp_vac_subset, x="PercentHispanic", y="CumCaseRatePer100",
-          add = "reg.line", conf.int = TRUE,
-          cor.coef = TRUE, cor.method = "spearman")
-p2 <- ggscatter(merge_shp_vac_subset, x="Percent65Plus", y="CumCaseRatePer100",
-          add = "reg.line", conf.int = TRUE,
-          cor.coef = TRUE, cor.method = "spearman")
-p3 <- ggscatter(merge_shp_vac_subset, x="PercentMale", y="CumCaseRatePer100",
-          add = "reg.line", conf.int = TRUE,
-          cor.coef = TRUE, cor.method = "spearman")
-p4 <- ggscatter(merge_shp_vac_subset, x="PercentBlack", y="CumCaseRatePer100",
-          add = "reg.line", conf.int = TRUE,
-          cor.coef = TRUE, cor.method = "spearman")
-p5 <- ggscatter(merge_shp_vac_subset, x="PercentAsian", y="CumCaseRatePer100",
-          add = "reg.line", conf.int = TRUE,
-          cor.coef = TRUE, cor.method = "spearman")
-p6 <- ggscatter(merge_shp_vac_subset, x="PercentMedCondition", y="CumCaseRatePer100",
-          add = "reg.line", conf.int = TRUE,
-          cor.coef = TRUE, cor.method = "spearman")
-p7 <- ggscatter(merge_shp_vac_subset, x="AREA_SQKM", y="CumCaseRatePer100",
-          add = "reg.line", conf.int = TRUE,
-          cor.coef = TRUE, cor.method = "spearman")
+fit1 <- lm(`Confirmed Cases` ~ PercentHispanic, data = merge_shp_vac_subset, offset = Population)
+summary(fit1) #Adjusted R-Squared = 0.56
 
-p_combined <- plot_grid(p1, p2, p3, p4, p5, p6, p7) 
+fit2 <- lm(`Confirmed Cases` ~ Percent65Plus, data = merge_shp_vac_subset, offset = Population)
+summary(fit2) #Adjusted R-Squared = 0.56
 
-# Save figure
-figure_file_association = here("results","p_combined.png")
-ggsave(filename = figure_file_association, plot=p_combined, height = 5, width = 15.5) 
+fit3 <- lm(`Confirmed Cases` ~ PercentMale, data = merge_shp_vac_subset, offset = Population)
+summary(fit3) #Adjusted R-Squared = 0.56
 
+fit4 <- lm(`Confirmed Cases` ~ PercentMedCondition, data = merge_shp_vac_subset, offset = Population)
+summary(fit4) #Adjusted R-Squared = 0.56
+
+fit5 <- lm(`Confirmed Cases` ~ PercentAsian, data = merge_shp_vac_subset, offset = Population)
+summary(fit5) #Adjusted R-Squared = 0.57
+
+fit6 <- lm(`Confirmed Cases` ~ PercentBlack, data = merge_shp_vac_subset, offset = Population)
+summary(fit6) #Adjusted R-Squared = 0.56
+
+fit7 <- lm(`Confirmed Cases` ~ AREA_SQKM, data = merge_shp_vac_subset, offset = Population)
+summary(fit7) #Adjusted R-Squared = 0.56
+#Why are they all about the same R-squared? I shouldn't use correlation tests (spearman, pearson) here because I need the offset
+
+#Cumulative Case Rate
+fit_rate <-  lm(sqrt(CumCaseRatePer100) ~ AREA_SQKM, data = merge_shp_vac_subset)
+summary(fit_rate) #Why is the R-squared so low when I try this (with or without transformation)? 
+
+cor.test(merge_shp_vac_subset$CumCaseRatePer100, merge_shp_vac_subset$AREA_SQKM, method = "pearson")
+
+#I am so confused...
+#Cumulative Case Rate
+ggplot(merge_shp_vac_subset, aes(y = log(CumCaseRatePer100), x = AREA_SQKM)) +
+       geom_point() +
+       geom_smooth(method = "lm")
+
+#Confirmed Cases
+ggplot(merge_shp_vac_subset, aes(y = log(`Confirmed Cases`), x = AREA_SQKM)) +
+       geom_point() +
+       geom_smooth()
+hist(merge_shp_vac_subset$AREA_SQKM) #is there just not enough range?
+#When I don't add lm, looks like a polynomial, but fit was worse when added ^2 or ^2 and ^3
+
+#Initially, I fit confirmed case against population numbers (# 65+) instead of percentages ((%65+) and the R-squared was like 0.99, so I think this is confounding because it's just getting at population size
+
+#Confirmed Case
+hist(log(merge_shp_vac_subset$`Confirmed Cases`)) #LOG TRANSFORMATION GIVES THE OUTCOME A NORMAL DISTRIBUTION! Since sample size is pretty small (254), law of large numbers doesn't apply.
+shapiro.test(log(merge_shp_vac_subset$`Confirmed Cases`))
+#Did try fitting log(Cofirmed Cases), but r-squared and AIC was worse
+
+#Cumulative Case Rate
+hist(merge_shp_vac_subset$CumCaseRatePer100)  
+shapiro.test(sqrt(merge_shp_vac_subset$CumCaseRatePer100)) #SQUARE ROOT TRANSFORMATION GIVES THE OUTCOME A NORMAL DISTRIBUTION
 ```
 
 ```{r}
-# p1 <- ggplot(merge_shp_vac_subset, aes(x=Population, y=`Confirmed Cases`)) +
-#   geom_point() +
-#   geom_smooth(method='lm') + #add linear regression line 
-#   #stat_regline_equation(label.y = 570000, aes(label = ..eq.label..)) +
-#   stat_regline_equation(aes(label = ..rr.label..)) +
-#   scale_x_continuous(labels = comma) + #remove scientific notation
-#   scale_y_continuous(labels = comma) 
+# p1 <- ggscatter(merge_shp_vac_subset, x="PercentHispanic", y="CumCaseRatePer100",
+#           add = "reg.line", conf.int = TRUE,
+#           cor.coef = TRUE, cor.method = "spearman")
+#
+# p2 <- ggscatter(merge_shp_vac_subset, x="Percent65Plus", y="CumCaseRatePer100",
+#           add = "reg.line", conf.int = TRUE,
+#           cor.coef = TRUE, cor.method = "spearman")
+# p3 <- ggscatter(merge_shp_vac_subset, x="PercentMale", y="CumCaseRatePer100",
+#           add = "reg.line", conf.int = TRUE,
+#           cor.coef = TRUE, cor.method = "spearman")
+# p4 <- ggscatter(merge_shp_vac_subset, x="PercentBlack", y="CumCaseRatePer100",
+#           add = "reg.line", conf.int = TRUE,
+#           cor.coef = TRUE, cor.method = "spearman")
+# p5 <- ggscatter(merge_shp_vac_subset, x="PercentAsian", y="CumCaseRatePer100",
+#           add = "reg.line", conf.int = TRUE,
+#           cor.coef = TRUE, cor.method = "spearman")
+# p6 <- ggscatter(merge_shp_vac_subset, x="PercentMedCondition", y="CumCaseRatePer100",
+#           add = "reg.line", conf.int = TRUE,
+#           cor.coef = TRUE, cor.method = "spearman")
+# p7 <- ggscatter(merge_shp_vac_subset, x="AREA_SQKM", y="CumCaseRatePer100",
+#           add = "reg.line", conf.int = TRUE,
+#           cor.coef = TRUE, cor.method = "spearman")
 # 
-# p2 <- ggplot(merge_shp_vac_subset, aes(x=PercentMale, y=CumCaseRatePer100)) +
-#   geom_point() +
-#   geom_smooth(method='lm') + #add linear regression line 
-#   #stat_regline_equation(label.y = 550000, aes(label = ..eq.label..)) +
-#   stat_regline_equation(aes(label = ..rr.label..)) +
-#   scale_x_continuous(labels = comma) + #remove scientific notation
-#   scale_y_continuous(labels = comma, limits = c(0, 30)) 
-# 
-# p3 <- ggplot(merge_shp_vac_subset, aes(x=PercentBlack, y=CumCaseRatePer100)) +
-#   geom_point() +
-#   geom_smooth(method='lm') + #add linear regression line 
-#   #stat_regline_equation(label.y = 550000, aes(label = ..eq.label..)) +
-#   stat_regline_equation(aes(label = ..rr.label..)) +
-#   scale_x_continuous(labels = comma) + #remove scientific notation
-#   scale_y_continuous(labels = comma, limits = c(0, 30)) 
-# 
-# p4 <- ggplot(merge_shp_vac_subset, aes(x=PercentAsian, y=CumCaseRatePer100)) +
-#   geom_point() +
-#   geom_smooth(method='lm') + #add linear regression line 
-#   #stat_regline_equation(label.y = 550000, aes(label = ..eq.label..)) +
-#   stat_regline_equation(aes(label = ..rr.label..)) +
-#   scale_x_continuous(labels = comma) + #remove scientific notation
-#   scale_y_continuous(labels = comma, limits = c(0, 30)) 
-# 
-# p5 <- ggplot(merge_shp_vac, aes(x=PercentHispanic, y=CumCaseRatePer100)) +
-#   geom_point() +
-#   geom_smooth(method='lm') + #add linear regression line 
-#   #stat_regline_equation(label.y = 550000, aes(label = ..eq.label..)) +
-#   stat_regline_equation(aes(label = ..rr.label..)) +
-#   scale_x_continuous(labels = comma) + #remove scientific notation
-#   scale_y_continuous(labels = comma, limits = c(0,30))
-# 
-# p6 <- ggplot(merge_shp_vac_subset, aes(x=Population_Density, y=CumCaseRatePer100)) +
-#   geom_point() +
-#   geom_smooth(method='lm') + #add linear regression line 
-#   #stat_regline_equation(label.y = 550000, aes(label = ..eq.label..)) +
-#   stat_regline_equation(aes(label = ..rr.label..)) +
-#   scale_x_continuous(labels = comma) + #remove scientific notation
-#   scale_y_continuous(labels = comma, limits = c(0, 30)) 
-# 
-# p7 <- ggplot(merge_shp_vac_subset, aes(x=Percent65Plus, y=CumCaseRatePer100)) +
-#   geom_point() +
-#   geom_smooth(method='lm') + #add linear regression line 
-#   #stat_regline_equation(label.y = 550000, aes(label = ..eq.label..)) +
-#   stat_regline_equation(aes(label = ..rr.label..)) +
-#   scale_x_continuous(labels = comma) + #remove scientific notation
-#   scale_y_continuous(labels = comma, limits = c(0, 30)) 
-# 
-# p8 <- ggplot(merge_shp_vac_subset, aes(x=PercentVaccinated_1dose, y=CumCaseRatePer100)) +
-#   geom_point() +
-#   geom_smooth(method='lm') + #add linear regression line 
-#   #stat_regline_equation(label.y = 550000, aes(label = ..eq.label..)) +
-#   stat_regline_equation(aes(label = ..rr.label..)) +
-#   scale_x_continuous(labels = comma) + #remove scientific notation
-#   scale_y_continuous(labels = comma, limits = c(0, 30)) 
-# 
-# p9 <- ggplot(merge_shp_vac_subset, aes(x=PercentVaccinated_full, y=CumCaseRatePer100)) +
-#   geom_point() +
-#   geom_smooth(method='lm') + #add linear regression line 
-#   #stat_regline_equation(label.y = 550000, aes(label = ..eq.label..)) +
-#   stat_regline_equation(aes(label = ..rr.label..)) +
-#   scale_x_continuous(labels = comma) + #remove scientific notation
-#   scale_y_continuous(labels = comma, limits = c(0, 30)) 
-# 
-# p_combined <- plot_grid(p1, p2, p3, p4, p5, p6, p7, p8, p9) 
-# 
-# #Save figure
-# figure_file_association = here("results","p_combined.png")
-# ggsave(filename = figure_file_association, plot=p_combined, height = 5, width = 15.5) 
-
+# p_combined <- plot_grid(p1, p2, p3, p4, p5, p6, p7) 
 ```
 
 

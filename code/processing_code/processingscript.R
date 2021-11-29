@@ -141,6 +141,9 @@ merge_shp_vac <- merge_shp %>%
   mutate(PercentBlack = NH_Black_Total /  Total * 100) %>%
   mutate(PercentMale = Total_Male / Total * 100)
 
+sum(merge_shp_vac$Population65Plus)/sum(merge_shp_vac$Total) #.129
+mean(merge_shp_vac$Percent65Plus) #18.5
+
 # save data as RDS
 # location to save file
 save_data_location1 <- here::here("data","processed_data","merge_shp_vac.rds")
