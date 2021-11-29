@@ -1,3 +1,2 @@
 -Everything should be able to be reproduced, start with processingscript.R > explorationscript.rmd > analysisscript.R
 -Knit Manuscript.rmd (in products folder) to HTML
--I will add more to the written sections + references next week! May need to ask some questions during office hours
