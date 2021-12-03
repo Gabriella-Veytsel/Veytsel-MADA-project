@@ -1,0 +1,166 @@
+---
+title: Project Review
+date: "`r file.mtime(knitr::current_input())`"
+#bibliography: ../media/references.bib
+output: 
+  html_document:
+    toc_depth: 3
+    number_sections: true
+---
+
+# Overview
+
+Title of project:"MADA Data Analysis Project: COVID-19 Case Burden, Texas"
+
+Name of project author(s): Gabriella Veytsel
+
+Name of project reviewer: Joe Martin
+
+# Specific project content evaluation
+
+## Background, Context and Motivation
+How well is the context of the project described? Is a comprehensive background, including summary of previous/related work given? Is the project well placed into the context of existing work (including proper referencing of existing work). Is it clear why the project was undertaken and what new information it hopes to provide?
+
+### Feedback and Comments
+
+Goal of this project is to predict where COVID-19 outbreaks are likely to occur given data from counties in Texas. It is clear why the project was undertaken, but I would like to read more about the background. Have other researchers tried similar approaches? What worked and what didn't work?
+
+### Summary assessment
+
+* strong contextualization and motivation
+
+
+## Question description
+How well and clear are the question(s)/hypotheses the project aims to address described? Is it clear how the questions relate to the data?
+
+
+### Feedback and Comments
+
+Questions and hypotheses are very clear. Goal is to investigate hereogeneity of COVID-19 in Texas, investigate cases ate the county level, and evaluate associations between county demographics and COVID cases. It would be helpful to have a little more information about some of the variables being tested in this section. 
+
+### Summary assessment
+
+* question/hypotheses fully clear
+
+
+## Data description
+How well is the data overall described? Is the source provided? Is a codebook or other meta-information available that makes it clear what the data is? 
+
+### Feedback and Comments
+
+Sources for the data are provided and the type of data available is intuitive - especially when reviewing the first paragraph in the Methods section. Like previous comment, it would be helpful to have a brief description of variables or types of variables available (ex. how does the health dataset present medical conditions? Does it list conditions for individuals? Does it just provide a count of medical conditions?). It would also be helpful to have more information in the readme file. The link to the Texas DHHS dashboard is helpful, but also confusing when confronted with all of the different data links.
+
+### Summary assessment
+
+* source and overall structure of data somewhat explained
+
+## Data wrangling and exploratory analysis
+How well is the data cleaned/processed and explored? Are all steps reasonable and well explained? Are alternatives discussed and considered? Are meaningful exploratory results shown (e.g. in the supplementary materials)?
+
+### Feedback and Comments
+
+Data cleaning/wrangling script is excellent. All steps were clearly defined and documented. I was really impressed by the figures in your exploratory analysis. I think all of these graphics did an excellent job telling a story. I especially liked the state maps. Only feedback I have for your exploratory is that I do wish there was a little more commentary so I could understand how your figures and tables relate to your paper and how you plan to use them. 
+
+### Summary assessment
+
+* essentially no weaknesses in wrangling and exploratory component
+
+## Appropriateness of Analysis
+Were the analysis methods appropriate for the data? Was the analysis done properly? Were different components of the analysis (e.g. performance measure, variable selection, data pre-processing, model evaluation) done in the best way possible and explained well?
+
+### Feedback and Comments
+
+Your analysis is easy to follow and your comments clearly discuss your and your actions. It seems like you tested several different models and did a good job of reviewing correlations and distributions in your data.
+
+### Summary assessment
+
+* strong and reasonable analysis
+
+## Presentation
+How well are results presented? Are tables and figures easy to read and understand? Are the main figures/tables publication level quality? 
+
+### Feedback and Comments
+
+The figures in your paper are high quality and do a good job of illustrating your research. It might help to have a little more explanation accompanying your figures to interpret what it should mean to the reader. For the supplementary figures, I'm not sure if you should take them out of the manuscript file, but I would think that section would improve if you could find a way to display them side-by-side instead of just having them vertical. 
+
+### Summary assessment
+
+* results are very well presented
+
+## Discussion/Conclusions
+Are the study findings properly discussed? Are strengths and limitations acknowledged? Are findings interpreted properly?
+
+### Feedback and Comments
+
+You did a good job of discussing the strengths and limitations of your models. I think there is more you could write in your "Strengths and Limitations" section. For example, you mentioned using cross-validation in your methods, but then your wrote that you are unable to assess overfitting without performing cross-validation. Did your models that used cross-validation not run? Was there another reason you this wasn't possible? What models/resampling methods would you recommend trying next?
+
+### Summary assessment
+
+* minor parts wrong, missing or unclear
+
+## Further comments
+
+_Hi Gabby,_
+
+_You did such an excellent job creating figures for your project! I'm especially impressed with your maps. It seems like you have many more useful figures related to your models, as well. The only thing I could think about changing would be the size and display of your tables. I'm not sure how to do this, but one suggestion I would have is to highlight individual values that are significant in your County table. It would also help to update the headers on this table._
+
+_Good luck on the rest of your project!_
+
+_-Joe_
+
+
+# Overall project content evaluation
+Evaluate overall features of the project  by filling in the sections below.
+
+
+## Structure
+Is the project well structured? Are files in well labeled folders? Do files have reasonable names? Are all "junk" files not needed for analysis/reproduction removed? By just looking at files and folders, can you get an idea of how things fit together?
+
+### Feedback and Comments
+
+I found a couple of empty or outdated readme files, as well as unused files and folders (for example /products/slides/...). Other than that, your repository seems to look good. It might be useful to list the files needed to run in your main readme file. 
+
+### Summary assessment
+
+* mostly clear, but some confusing parts (e.g. useless files, things in the wrong folders)
+
+## Documentation 
+How well is the project documented? Are you able to understand each step of the whole analysis, each decision that was made, and each line of code? Is enough information provided as comments in code or as part of Rmd files? 
+
+### Feedback and Comments
+
+There were a couple of files I found that were missing comments where I thought they would have been useful, like your exploration script. There were certain places in your manuscript where I wanted more information about your analysis, as well. Other than that, your files have good, clear documentation. 
+
+### Summary assessment
+
+* decently documented with some gaps
+
+## Reproducibility
+Are all results fully reproducible? Is documentation provided which clearly explains how to reproduce things, and does it work without the need for any manual intervention? Are you able to re-run the whole analysis without having to do manual interventions/edits?
+
+### Feedback and Comments
+
+There isn't documentation with instructions to reproduce your project, but I didn't run into any issues running your code. Like I mentioned earlier, it might be useful to include a list of the necessary files to run in your main readme page. 
+
+### Summary assessment
+
+* fully reproducible without issues
+
+## Thoroughness
+How thorough was the overall study? Were alternatives (e.g. different ways of processing the data or different models) considered? Were alternatives discussed? Were the questions/hypotheses fully and thoroughly addressed?
+
+### Feedback and Comments
+
+It seems like you were very thorough in your project. Again, I'm impressed by all of your figures and tables and it looks like you were able to run several different models which performed progressively better. I think you address your questions/hypotheses in "Methods and Results," but you have room to expand on them in your Discussion
+
+### Summary assessment
+
+* strong level of thoroughness
+
+## Further comments
+
+_Once again, good job on your project! I'm looking forward to reading your final paper._
+
+
+
+
