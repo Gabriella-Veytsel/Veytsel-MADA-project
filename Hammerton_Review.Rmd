@@ -1,0 +1,166 @@
+---
+title: "Project Review for Gabriella Veytsel"
+author: "Savannah Hammerton"
+date: "Fall 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Overview
+
+Title of project: MADA Data Analysis Project: COVID-19 Case Burden, Texas
+
+Name of project author(s): Gabriella Veytsel
+
+Name of project reviewer: Savannah Hammerton 
+
+
+## Background, Context and Motivation
+
+### Feedback and Comments
+
+You did a good job giving general background of why you performed this analysis.
+
+In your summary/abstract, I would recommend being more clear when you say "a model is needed with a more granular resolution." Since you haven't mentioned any outcomes/public health issues yet, I was a little confused as to what model you were referring to. 
+
+Additionally, in the introduction section, when you say 
+
+"According to the CDC, age is the strongest risk factor for severe COVID-19 morbidity; additionally, the risk of severe COVID-19 increase as the number of underlying medical conditions increase in an individual (Assessing risk factors for severe COVID-19 illness, 2020). Communities of color in the United States experience structural, social, and environmental inequities that increase risk for infection and severe illness (Bhala, 2020) and have experienced substantial barriers to and disparities in COVID-19 testing (In large texas cities, access to coronavirus testing may depend on where you live, 2020)",
+
+it might help to have something describing how those two statements are related. Since the first statement refers to more physical attributes and the second refers to more social/environmental attributes, it almost made the reasoning for the analysis weaker to me. It made it seem like maybe the focus should have been on the age/underlying medical conditions, since those are what the CDC mentioned as important factors. 
+
+I liked that you ended your introduction with what public health interventions could be impacted by the outcome of your analysis; that's definitely a great thing to have in there for motivation.
+
+### Summary assessment 
+
+* some contextualization and motivation
+
+## Question description
+
+### Feedback and Comments
+
+I like that you have your questions explicitly listed. It might help to have some sort of statement prior to the questions themselves to re-introduce the overall, broader question you are trying to answer by answering these specific questions. 
+
+### Summary assessment
+
+* question/hypotheses fully clear
+
+## Data description
+
+### Feedback and Comments
+
+From the description of the data, I don't see anything about data that describes populations. "Population estimates" makes me think of population counts in each county. Adding something about demographic information or what exact predictors you're using could help. 
+
+### Summary assessment
+
+* source and overall structure of data somewhat explained
+
+## Data wrangling and exploratory analysis
+
+### Feedback and Comments
+
+I haven't seen anywhere so far that explicitly states what your predictors are, how you are looking for them, or checking their distributions. I found one table giving summaries of demographics, but everything else seems to be focused on your outcome. I'm a little confused about whether your predictor is just counties, or if you're specifically using demographic information as predictors as well. 
+
+Otherwise, you have a lot of exploration of the outcome, and some really nice visualizations! I like that you made sure to assess both disease counts and rates. Your maps and epidemic curves look nice. 
+
+### Summary assessment
+
+* some weaknesses in wrangling and exploratory component
+
+
+## Appropriateness of Analysis
+
+### Feedback and Comments
+
+I liked that I could see how the ML models improved on the performance on the performance of the log binomial and poisson models. I saw that conducted some log transformation in those models; I would recommend trying that in your ML models as well.`step_log()` and 'step_normalize()` could both help your numeric predictors, but checking the distributions of all your predictors would tell you specifically which ones really need it. 
+
+I would add some of the process you went through in the analyses to the manuscript, as well as a little more detail on why you selected the random forest as your final model (i.e., was there any reason besides the RMSE that you chose that over the LASSO model?). 
+
+### Summary assessment
+
+* defensible but not optimal analysis 
+
+## Presentation
+
+### Feedback and Comments
+
+Overall, I think the figures you present look really nice! For cohesiveness' sake, they could benefit from all having the same background/theme. As it is, some have a white/blank background while others have the grey/lined default ggplot background. If you use `theme_set(*insert the theme you like here*)` at the beginning of scripts where you create plots, it could help the consistency of appearance. The plot sizes are also pretty variable, and some could stand to be a little bigger (I had to squint, but to be fair, my eyesight is terrible). Adding a little more description to figure captions could help as well with comprehension of the what you're trying to show! 
+
+### Summary assessment
+
+* results are presented ok, with room for improvement
+
+
+## Discussion/Conclusions
+
+### Feedback and Comments
+
+Your strengths and limitations section has a lot if great points, and seems very comprehensive! I think you could use some more discussion. You've got a some good explanations of the final model, but discussing the other models you fit and how they performed, and maybe why they may have performed the way they did, could be a good addition here. Your conclusion section could also use some more text, specifically referring to the final model, since such a huge part of this project/class is selecting and fitting a final model and assessing performance. 
+
+### Summary assessment
+
+* major parts of discussion missing or wrong 
+
+
+## Further comments
+
+Some or all of the text directly in the Methods section could be distributed between the exploratory/full analysis sections. This would help the flow of the manuscript and allow the figures currently in those sections to be more easily understood in the context of what you were doing when you generated them. 
+
+
+# Overall project content evaluation
+
+## Structure
+
+### Feedback and Comments
+
+Everything is easy to find and makes sense! Your products folder still has the slides, which don't seem to contain any information from you, so you could probably delete those. Your README files also help it determining what to run if there's any confusion. 
+
+### Summary assessment
+
+* well structured
+
+
+## Documentation 
+
+
+### Feedback and Comments
+
+Your analysis script has good comments, especially as you respond to output of your models. Your processing and exploration scripts could use some more commentary; this could help give better context for your decisions in the analysis script! 
+
+### Summary assessment
+
+* decently documented with some gaps
+
+## Reproducibility
+
+### Feedback and Comments
+
+Everything ran with no problems! It was also clear what should be run and in what order! 
+
+### Summary assessment
+
+* fully reproducible without issues
+
+
+## Thoroughness
+
+
+### Feedback and Comments
+
+I think the project could use some additions, but I've already mentioned them (namely, more exploration of predictors, maybe some transformation of predictors in the ML models). The manuscript could also use some extra commentary, and you could maybe discuss whether/how you were able to address and answer your research questions. 
+
+### Summary assessment
+
+* decent level of thoroughness
+
+
+## Further comments
+
+This is a really interesting project! I think with just a few tweaks/additions, it could be really strong! Great job. 
+
+
+
+
