@@ -1,0 +1,163 @@
+# Overview
+
+Title of project: MADA Data Analysis Project: COVID-19 Case Burden, Texas
+
+Name of project author(s): Gabriella Veytsel
+
+Name of project reviewer: Nicholas Mallis
+
+
+
+
+## Background, Context and Motivation
+How well is the context of the project described? Is a comprehensive background, including summary of previous/related work given? Is the project well placed into the context of existing work (including proper referencing of existing work). Is it clear why the project was undertaken and what new information it hopes to provide?
+
+### Feedback and Comments
+
+Hi! I also used county data for my project so this looks somewhat familiar. My outcome was vaccination rate though. I think you do a great job laying out the the background and motivation for the study. I agree that aggregate data like this could help inform intervention/vaccination campaigns.
+
+### Summary assessment 
+* strong contextualization and motivation
+
+
+## Question description
+How well and clear are the question(s)/hypotheses the project aims to address described? Is it clear how the questions relate to the data?
+
+
+### Feedback and Comments
+
+I think you did a great job laying this out. I'm impressed that you asked three questions that all take on quite a bit of work to answer! My one suggestion would be to move some of these questions up to the end of the introduction. I feel like that's usually how we would see it in a paper... It starts with background and ends with research question or question(s) in your case. It also might be good to have it in sentence form instead of bulleted out. I like how clear it looks right now, but if Dr. Handel is wanting us to have this as something mostly ready to submit, he might like to see it written out. But I could be wrong :| 
+
+### Summary assessment
+* question/hypotheses fully clear
+
+
+## Data description
+How well is the data overall described? Is the source provided? Is a codebook or other meta-information available that makes it clear what the data is? 
+
+### Feedback and Comments
+
+I think you did a good job laying out the sources and appropriately citing them.
+
+### Summary assessment
+* source and overall structure of data well explained
+
+
+## Data wrangling and exploratory analysis
+How well is the data cleaned/processed and explored? Are all steps reasonable and well explained? Are alternatives discussed and considered? Are meaningful exploratory results shown (e.g. in the supplementary materials)?
+
+### Feedback and Comments
+Great job on the map and the EPI curve! I know both of those can be tricky and a lot of work. I also like how you highlight certain counties with the highest rates. I also like your use of the table1 package. I've used that before but for some reason I decided not to use it for mine and it was ugly. I didn't see it here, but did you plot histograms for continuous variables? That could be good to do in order to explore how each are distributed. With my project I did that for each variable and found some weird stuff ( a lot of 0's which were actually missing). It helped me figure out what was going on in the data a bit more. Could help you here, but it looks like you know good and well what's going on in your data already. Okay  well nevermind... now that I got to bottom of your document I see some histograms and normality tests : ) 
+
+I don't see any mention of missingness or code that looks for missing data in each variable in your exploration script. That could be good to explore. Here is some code I used to explore that in my project...
+
+colMeans(is.na(complete))
+
+Here 'complete' is the name of the dataset. It returns each variable's proportion of missing.
+
+### Summary assessment
+* essentially no weaknesses in wrangling and exploratory component
+
+
+
+## Appropriateness of Analysis
+Were the analysis methods appropriate for the data? Was the analysis done properly? Were different components of the analysis (e.g. performance measure, variable selection, data pre-processing, model evaluation) done in the best way possible and explained well?
+
+### Feedback and Comments
+I'm impressed at 1) how well you explained your analysis and 2) the fact that I actually understood most of it : )  I think it's great that you tried so many different methods/models and went in depth on diagnostic plots and performance measures. In most epi papers, I feel like they have methods and results as two seperate sections, but I feel like with ML models that's almost impossible to do. I like how you collapsed both into one section. It walks the reader through your logic, analysis steps, and results nicely. I did my project with it split up into methods and results, but I might rework mine like yours here. 
+
+### Summary assessment
+* strong and reasonable analysis
+
+## Presentation
+How well are results presented? Are tables and figures easy to read and understand? Are the main figures/tables publication level quality? 
+
+### Feedback and Comments
+As I said before, I'm really impressed with the figures you put together. My only suggestion on those would be to add footnotes to them citing the sources (which I know can be sort of annoying). I meant to do that to my project before Monday, but forgot. I (think) Dr. Handel would want to see stuff like that given that it's supposed to be ready for publication.
+
+The tables look great! But one thing I notice is that a lot of the variable names are still in their coded form. He might want to see them written out without the '_'s and what not, but I could be wrong. Another idea would be to include full names in the footnote. And same thing goes for the tables, maybe add footnotes citing the source (something I also didn't do but planned to).
+
+One last thing. On my end here, the title for table 2 came out like this..  (#tab:table_county). I think you could fix that pretty easy. It might have been a typo. Another note on table 2... Maybe try using the round() function when summarizing the data to get the results down to one or two digits after the decimal. It might make your table smaller and easier to read. When the numbers are higher like this, I don't think anything after one or two digits really adds much.
+
+### Summary assessment
+* results are very well presented
+
+
+## Discussion/Conclusions
+Are the study findings properly discussed? Are strengths and limitations acknowledged? Are findings interpreted properly?
+
+### Feedback and Comments
+Based upon your logic and modeling strategies (and my new found understanding of ML methods), it seems to me that you have interpreted and explained the results of your study correct. One other limitation that you might want to mention could be the fact that some of your data comes from previous years and these metrics could have changed between 2019 and now.
+
+### Summary assessment
+* strong, complete and clear discussion
+
+
+## Further comments
+
+One last suggestion on the manuscript would be to rework the structure of headings by removing the numbers in front of the sections. I guess like before, I am just going off of what Dr. Handel said about ready for publication and I feel like most stuff I've worked on hasn't had numbers in front of sections and sub sections, but that could have just been the publications we were going for. Also might want to make your heading a little bit smaller.
+
+
+
+# Overall project content evaluation
+Evaluate overall features of the project  by filling in the sections below.
+
+
+## Structure
+Is the project well structured? Are files in well labeled folders? Do files have reasonable names? Are all "junk" files not needed for analysis/reproduction removed? By just looking at files and folders, can you get an idea of how things fit together?
+
+### Feedback and Comments
+
+Looks great! Very organized.
+
+### Summary assessment
+
+* well structured
+
+
+## Documentation 
+How well is the project documented? Are you able to understand each step of the whole analysis, each decision that was made, and each line of code? Is enough information provided as comments in code or as part of Rmd files? 
+
+### Feedback and Comments
+
+As I said before, I think you did a great job walking the reader or reviewer through your steps in both the manuscript and the code. I do have a suggestion for the README files though. A few of them were empty and overall, based on Dr. Handel's examples, I think he might want more description here. Also, one of them reads like this...
+
+"Run the analysisscript.rmd to generate an html
+Exercise 10 begins on line 366 "
+
+I'm guessing that is left over from the template or an accidental paste. Either way, you probably want to get that removed.
+
+### Summary assessment
+* fully and well documented
+
+
+
+## Reproducibility
+Are all results fully reproducible? Is documentation provided which clearly explains how to reproduce things, and does it work without the need for any manual intervention? Are you able to re-run the whole analysis without having to do manual interventions/edits?
+
+### Feedback and Comments
+
+Everything ran without any errors!
+
+### Summary assessment
+* fully reproducible without issues
+
+
+## Thoroughness
+How thorough was the overall study? Were alternatives (e.g. different ways of processing the data or different models) considered? Were alternatives discussed? Were the questions/hypotheses fully and thoroughly addressed?
+
+### Feedback and Comments
+I feel like you went above and beyond with both the desriptive analysis and the modeling. I would say this is very thorough. 
+
+### Summary assessment
+* strong level of thorougness
+
+
+## Further comments
+
+_Add any other comments regarding the overall project here. Write anything you think can help your classmate improve their project._
+
+
+
+
+
